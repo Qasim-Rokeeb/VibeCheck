@@ -54,23 +54,6 @@
 - Daily streaks increase engagement
 - All game state is frontend-based or stored via Supabase
 
----
-
-## 📂 Project Structure
-
-```
-vibecheck/
-│
-├── app/                  # App Router Pages
-│   └── frame/            # Frame endpoint (frame.html, OG metadata)
-├── components/           # Reusable UI components (EmojiCard, VoteButton, etc.)
-├── lib/                  # Utility functions (e.g. Farcaster helpers, streak logic)
-├── public/               # Static assets (screenshots, favicon)
-├── styles/               # Tailwind config and global styles
-├── utils/                # XP, emoji pool, leaderboard helpers
-├── .env.local            # Environment variables
-└── README.md             # This file
-```
 
 ---
 
