@@ -168,7 +168,7 @@ Feel free to open issues or PRs! Ideal contributions include:
 
 ## 🧵 Credits
 
-- Built with ❤️ by [@yourhandle](https://warpcast.com/thecodinggeek)
+- Built with ❤️ by [@thecodinggeek](https://warpcast.com/thecodinggeek)
 - Powered by [Farcaster](https://www.farcaster.xyz/)
 - Emoji set inspired by community vibes 😎
 ---
