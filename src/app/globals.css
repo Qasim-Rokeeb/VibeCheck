@@ -5,6 +5,8 @@
 @layer base {
   :root {
     --background: 210 20% 95%; /* Alice Blue-ish */
+    --background-start-rgb: 235, 245, 255;
+    --background-end-rgb: 220, 235, 255;
     --foreground: 210 10% 20%; /* Dark Slate Blue */
 
     --card: 210 20% 100%;
@@ -38,6 +40,8 @@
   .dark {
     /* A consistent dark theme based on the light theme's palette */
     --background: 210 10% 10%;
+    --background-start-rgb: 18, 20, 25;
+    --background-end-rgb: 30, 35, 45;
     --foreground: 210 20% 95%;
 
     --card: 210 10% 12%;
@@ -72,6 +76,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: linear-gradient(120deg, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
   }
 }
