@@ -12,6 +12,7 @@ import { Leaderboard } from '@/components/vibe-check/Leaderboard';
 import { dailyEmojis, winningEmoji as mockWinningEmoji } from '@/lib/mock-data';
 import { Flame, Star } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { Footer } from '@/components/vibe-check/Footer';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -114,6 +115,7 @@ export default function Home() {
             <Leaderboard />
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );
