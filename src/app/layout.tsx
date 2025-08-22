@@ -14,6 +14,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentMonth = new Date().getMonth();
+  // October is month 9 (0-indexed)
+  const isSpookySeason = currentMonth === 9;
+
   return (
     <html lang="en" className="bg-background" suppressHydrationWarning>
       <head>
@@ -28,6 +32,7 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
+            forcedTheme={isSpookySeason ? "theme-spooky" : undefined}
           >
           <TooltipProvider>
             {children}

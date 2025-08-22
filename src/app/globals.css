@@ -69,6 +69,38 @@
     --input: 210 10% 25%;
     --ring: 210 70% 55%;
   }
+
+  .theme-spooky {
+    --background: 240 5% 15%;
+    --background-start-rgb: 35, 33, 41;
+    --background-end-rgb: 25, 23, 31;
+    --foreground: 240 5% 90%;
+
+    --card: 240 5% 18%;
+    --card-foreground: 240 5% 90%;
+
+    --popover: 240 5% 18%;
+    --popover-foreground: 240 5% 90%;
+
+    --primary: 25 95% 53%; /* Pumpkin Orange */
+    --primary-foreground: 25 95% 98%;
+
+    --secondary: 240 5% 25%;
+    --secondary-foreground: 240 5% 90%;
+
+    --muted: 240 5% 25%;
+    --muted-foreground: 240 5% 60%;
+
+    --accent: 270 90% 65%; /* Spooky Purple */
+    --accent-foreground: 270 90% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5% 30%;
+    --input: 240 5% 30%;
+    --ring: 25 95% 53%;
+  }
 }
 
 @layer base {
