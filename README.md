@@ -1,4 +1,3 @@
-
 # 🎯 VibeCheck
 
 **VibeCheck** is a social, addictive, and daily-playable emoji-guessing game built as a **Farcaster Frame**. Each day, users guess the emoji that best captures the "vibe" of the community. One vote. One shot. Guess right, and rise up the leaderboard!
@@ -159,5 +158,3 @@ Feel free to open issues or PRs! Ideal contributions include:
 ## 🙋‍♂️ Questions or Feedback?
 
 Ping me on [Warpcast](https://warpcast.com/) or [Twitter](https://twitter.com/) — let’s vibe 🔥
-
-```
