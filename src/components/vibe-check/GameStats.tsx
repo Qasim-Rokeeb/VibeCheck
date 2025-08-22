@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Flame, Star } from 'lucide-react';
+import { Flame, Star, Zap } from 'lucide-react';
 import { Progress } from '../ui/progress';
 
 type GameStatsProps = {
@@ -15,12 +15,22 @@ const calculateLevel = (xp: number) => {
   const nextLevelXP = Math.pow(level, 2) * 10;
   const currentLevelXP = Math.pow(level - 1, 2) * 10;
   const progress = ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-  return { level, progress };
+  return { level, progress, nextLevelXP };
+};
+
+const streakMilestones = [3, 7, 14, 30];
+
+const calculateStreak = (streak: number) => {
+  const currentMilestone = streakMilestones.find(m => streak < m) || streakMilestones[streakMilestones.length -1];
+  const previousMilestone = streakMilestones.slice().reverse().find(m => m <= streak) || 0;
+  const milestoneProgress = ((streak - previousMilestone) / (currentMilestone - previousMilestone)) * 100;
+  return { milestoneProgress, nextMilestone: currentMilestone };
 };
 
 
 export function GameStats({ stats }: GameStatsProps) {
-  const { level, progress } = calculateLevel(stats.xp);
+  const { level, progress, nextLevelXP } = calculateLevel(stats.xp);
+  const { milestoneProgress, nextMilestone } = calculateStreak(stats.streak);
 
   return (
     <Card className="shadow-lg">
@@ -30,21 +40,23 @@ export function GameStats({ stats }: GameStatsProps) {
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <div className="flex justify-between items-center text-muted-foreground text-sm">
-            <span>Level {level}</span>
-            <span className="font-semibold text-foreground">{stats.xp} XP</span>
+            <span className="font-semibold">Level {level}</span>
+            <span className="font-semibold text-foreground">{stats.xp} / {nextLevelXP} XP</span>
           </div>
-          <Progress value={progress} aria-label={`${progress}% to next level`} />
+          <Progress value={progress} aria-label={`${progress.toFixed(0)}% to next level`} />
         </div>
 
-        <div className="flex items-center justify-center gap-8 text-center">
-            <div>
-              <p className="text-sm text-muted-foreground">Streak</p>
-              <div className="flex items-end justify-center gap-2">
-                <span className="text-4xl font-bold font-headline text-primary">{stats.streak}</span>
-                <Flame className="h-8 w-8 text-orange-400 mb-1" />
-              </div>
+        <div className="space-y-2">
+            <div className="flex justify-between items-center text-muted-foreground text-sm">
+                <div className="flex items-center gap-1">
+                    <Flame className="h-4 w-4 text-orange-500" />
+                    <span className="font-semibold">Current Streak</span>
+                </div>
+                <span className="font-semibold text-foreground">{stats.streak} Days</span>
             </div>
-          </div>
+            <Progress value={milestoneProgress} className="[&>div]:bg-orange-500" aria-label={`Streak progress: ${milestoneProgress.toFixed(0)}%`} />
+            <p className="text-xs text-muted-foreground text-right">Next bonus at {nextMilestone} days!</p>
+        </div>
       </CardContent>
     </Card>
   );
