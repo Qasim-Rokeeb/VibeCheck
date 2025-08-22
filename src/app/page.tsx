@@ -13,6 +13,7 @@ import { dailyEmojis, winningEmoji as mockWinningEmoji } from '@/lib/mock-data';
 import { Flame, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
+import Confetti from 'react-confetti';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -20,6 +21,8 @@ export default function Home() {
   const [hasVotedToday, setHasVotedToday] = useState(false);
   const [winningEmoji, setWinningEmoji] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     setIsClient(true);
@@ -32,6 +35,17 @@ export default function Home() {
       setSelectedEmoji(storedVote);
       setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
     }
+
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleVote = (emoji: string) => {
@@ -48,6 +62,9 @@ export default function Home() {
     let streakBonus = 0;
 
     if (emoji === mockWinningEmoji) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000); // Confetti for 5 seconds
+
       xpGained = 10;
       if (userStats.streak >= 3) {
         streakBonus = 5;
@@ -89,6 +106,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-background text-foreground p-4 sm:p-6 md:p-8">
+       {isClient && showConfetti && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          recycle={false}
+          numberOfPieces={400}
+        />
+      )}
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <Header />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
