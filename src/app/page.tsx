@@ -76,8 +76,8 @@ export default function Home() {
   const handleVote = (emoji: string) => {
     if (hasVotedToday) return;
 
-    const today = new Date().toDateString();
-    localStorage.setItem('vibeCheckVoteDate', today);
+    const voteDate = new Date();
+    localStorage.setItem('vibeCheckVoteDate', voteDate.toDateString());
     localStorage.setItem('vibeCheckVoteEmoji', emoji);
     setSelectedEmoji(emoji);
     setHasVotedToday(true);
@@ -85,6 +85,7 @@ export default function Home() {
 
     let xpGained = 0;
     let streakBonus = 0;
+    let isWeekendBonus = false;
     let toastDescription: React.ReactNode;
 
     if (emoji === mockWinningEmoji) {
@@ -92,6 +93,12 @@ export default function Home() {
       setTimeout(() => setShowConfetti(false), 5000); // Confetti for 5 seconds
 
       xpGained = 10;
+      const dayOfWeek = voteDate.getDay(); // Sunday = 0, Saturday = 6
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        xpGained *= 2;
+        isWeekendBonus = true;
+      }
+      
       if (userStats.streak >= 3) {
         streakBonus = 5;
       }
@@ -104,6 +111,9 @@ export default function Home() {
       toastDescription = (
         <>
           <span className="font-bold text-green-500">You guessed correctly!</span>
+          {isWeekendBonus && (
+            <span className="font-bold text-primary">Weekend Bonus: 2x XP!</span>
+          )}
           <span>
             + {xpGained} XP <Star className="inline h-4 w-4 text-yellow-400 fill-yellow-400" />
           </span>
