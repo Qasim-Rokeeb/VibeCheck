@@ -17,6 +17,15 @@ import { Footer } from '@/components/vibe-check/Footer';
 import Confetti from 'react-confetti';
 import { BottomNav } from '@/components/vibe-check/BottomNav';
 import { seededShuffle } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -32,32 +41,57 @@ export default function Home() {
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [useStreakFreeze, setUseStreakFreeze] = useState(false);
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
+  const [showStreakLossModal, setShowStreakLossModal] = useState(false);
 
   const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
-    const today = new Date().toDateString();
-    const lastVoteDate = localStorage.getItem('vibeCheckVoteDate');
-    const storedVote = localStorage.getItem('vibeCheckVoteEmoji');
+    const today = new Date();
+    const todayString = today.toDateString();
     
+    const lastVoteDateStr = localStorage.getItem('vibeCheckVoteDate');
+    const storedVote = localStorage.getItem('vibeCheckVoteEmoji');
+    const storedUserStatsStr = localStorage.getItem('vibeCheckUserStats');
+
     // Shuffle emojis daily for all users consistently
-    setShuffledEmojis(seededShuffle(dailyEmojis, today));
+    setShuffledEmojis(seededShuffle(dailyEmojis, todayString));
 
-    if (lastVoteDate === today && storedVote) {
-      setHasVotedToday(true);
-      setSelectedEmoji(storedVote);
-      setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
-    }
-
-    const storedUserStats = localStorage.getItem('vibeCheckUserStats');
-    if (storedUserStats) {
-      const parsedStats = JSON.parse(storedUserStats);
-      setUserStats({
+    if (storedUserStatsStr) {
+      const parsedStats = JSON.parse(storedUserStatsStr);
+      const currentStats = {
         ...parsedStats,
         lastStreakFreeze: parsedStats.lastStreakFreeze ? new Date(parsedStats.lastStreakFreeze) : null,
-      });
+      };
+
+      if (lastVoteDateStr) {
+        const lastVoteDate = new Date(lastVoteDateStr);
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        if (lastVoteDate.toDateString() !== todayString && lastVoteDate.toDateString() !== yesterday.toDateString()) {
+           if (currentStats.streak > 0) {
+              setShowStreakLossModal(true);
+              const newStats = { ...currentStats, streak: 0 };
+              setUserStats(newStats);
+              localStorage.setItem('vibeCheckUserStats', JSON.stringify(newStats));
+            }
+        }
+      } else if (currentStats.streak > 0) {
+        // If there are stats but no vote date, it implies a missed day from a previous session.
+        setShowStreakLossModal(true);
+        const newStats = { ...currentStats, streak: 0 };
+        setUserStats(newStats);
+        localStorage.setItem('vibeCheckUserStats', JSON.stringify(newStats));
+      }
+       if (lastVoteDateStr === todayString && storedVote) {
+        setHasVotedToday(true);
+        setSelectedEmoji(storedVote);
+        setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
+      }
+      setUserStats(currentStats);
     }
+
 
     const handleResize = () => {
       setWindowSize({
@@ -212,7 +246,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-background text-foreground p-4 sm:p-6 md:p-8 pb-20">
-       {isClient && showConfetti && (
+      {isClient && showConfetti && (
         <Confetti
           width={windowSize.width}
           height={windowSize.height}
@@ -220,6 +254,20 @@ export default function Home() {
           numberOfPieces={400}
         />
       )}
+      <AlertDialog open={showStreakLossModal} onOpenChange={setShowStreakLossModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2"><Flame className="h-6 w-6 text-destructive" />Streak Lost!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Oh no! You missed a day and your streak has been reset to zero. Don't worry, you can start a new one today!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowStreakLossModal(false)}>Got it</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <Header />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
