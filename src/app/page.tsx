@@ -11,7 +11,7 @@ import { AiVibeTool } from '@/components/vibe-check/AiVibeTool';
 import { GameStats } from '@/components/vibe-check/GameStats';
 import { Leaderboard } from '@/components/vibe-check/Leaderboard';
 import { dailyEmojis, winningEmoji as mockWinningEmoji } from '@/lib/mock-data';
-import { Flame, Star } from 'lucide-react';
+import { Flame, Star, Vote } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
 import Confetti from 'react-confetti';
@@ -85,8 +85,10 @@ export default function Home() {
 
     let xpGained = 0;
     let streakBonus = 0;
+    let firstVoteBonus = 2; // Bonus for voting
     let isWeekendBonus = false;
     let toastDescription: React.ReactNode;
+    let newStats = { ...userStats };
 
     if (emoji === mockWinningEmoji) {
       setShowConfetti(true);
@@ -102,15 +104,18 @@ export default function Home() {
       if (userStats.streak >= 3) {
         streakBonus = 5;
       }
-      const newStats = {
+      newStats = {
         ...userStats,
-        xp: userStats.xp + xpGained + streakBonus,
+        xp: userStats.xp + xpGained + streakBonus + firstVoteBonus,
         streak: userStats.streak + 1,
       };
-      setUserStats(newStats);
+      
       toastDescription = (
         <>
           <span className="font-bold text-green-500">You guessed correctly!</span>
+          <span>
+            + {firstVoteBonus} XP <Vote className="inline h-4 w-4 text-primary" /> (Vote Bonus)
+          </span>
           {isWeekendBonus && (
             <span className="font-bold text-primary">Weekend Bonus: 2x XP!</span>
           )}
@@ -125,30 +130,41 @@ export default function Home() {
         </>
       );
     } else {
-      if (useStreakFreeze) {
-        const newStats = {
-            ...userStats,
-            lastStreakFreeze: new Date(),
-        };
-        setUserStats(newStats);
-        toastDescription = (
-            <>
-                <span className="font-bold text-blue-500">Streak Frozen!</span>
-                <span>Your streak is safe for today.</span>
-            </>
-        );
-      } else {
-        const newStats = { ...userStats, streak: 0 };
-        setUserStats(newStats);
-        toastDescription = (
-            <>
-                <span className="font-bold text-destructive">Not this time!</span>
-                <span>Your streak has been reset.</span>
-            </>
-        );
-      }
+        if (useStreakFreeze) {
+            newStats = {
+                ...userStats,
+                xp: userStats.xp + firstVoteBonus,
+                lastStreakFreeze: new Date(),
+            };
+            toastDescription = (
+                <>
+                    <span className="font-bold text-blue-500">Streak Frozen!</span>
+                    <span>
+                        + {firstVoteBonus} XP <Vote className="inline h-4 w-4 text-primary" /> (Vote Bonus)
+                    </span>
+                    <span>Your streak is safe for today.</span>
+                </>
+            );
+        } else {
+            newStats = { 
+              ...userStats, 
+              xp: userStats.xp + firstVoteBonus,
+              streak: 0 
+            };
+            toastDescription = (
+                <>
+                    <span className="font-bold text-destructive">Not this time!</span>
+                    <span>
+                        + {firstVoteBonus} XP <Vote className="inline h-4 w-4 text-primary" /> (Vote Bonus)
+                    </span>
+                    <span>Your streak has been reset.</span>
+                </>
+            );
+        }
     }
     
+    setUserStats(newStats);
+
     toast({
       title: "Vote Cast!",
       description: <div className="flex flex-col">{toastDescription}</div>,
