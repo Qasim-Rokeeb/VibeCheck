@@ -2,7 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CheckCircle, MessageSquareQuote, XCircle } from 'lucide-react';
+import { CheckCircle, MessageSquareQuote, Trophy, XCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 type ResultsProps = {
   selectedEmoji: string | null;
@@ -20,78 +21,92 @@ export function Results({ selectedEmoji, winningEmoji }: ResultsProps) {
 
   const didWin = selectedEmoji === winningEmoji;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, scale: 0.8, y: 20 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+      }
+    },
+  };
+
   return (
-    <div className="flex flex-col items-center gap-6 text-center">
-      <h3 className="text-2xl font-bold font-headline">The results are in!</h3>
+    <motion.div 
+      className="flex flex-col items-center gap-6 text-center"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.h3 variants={itemVariants} className="text-2xl font-bold font-headline">The results are in!</motion.h3>
+      
       <div className="flex flex-wrap justify-center gap-6 md:gap-10">
-        <div className="flex flex-col items-center gap-2">
+        <motion.div variants={itemVariants} className="flex flex-col items-center gap-2">
           <p className="font-semibold text-muted-foreground">Your Vote</p>
           <div className="text-6xl md:text-7xl p-4 bg-secondary rounded-2xl shadow-inner">
             {selectedEmoji}
           </div>
-        </div>
-        <div className="flex flex-col items-center gap-2">
+        </motion.div>
+        <motion.div variants={itemVariants} className="flex flex-col items-center gap-2">
           <p className="font-semibold text-muted-foreground">Winning Vibe</p>
           <div className="relative text-6xl md:text-7xl p-4 bg-primary/10 border-2 border-primary rounded-2xl shadow-inner">
-            <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground rounded-full p-2">
-                <TrophyIcon className="w-5 h-5" />
-            </div>
+            <motion.div 
+              className="absolute -top-4 -right-4 bg-primary text-primary-foreground rounded-full p-2"
+              initial={{ scale: 0, rotate: -45 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 15 }}
+            >
+                <Trophy className="w-5 h-5" />
+            </motion.div>
             {winningEmoji}
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <Card
-        className={`p-4 w-full max-w-sm ${
-          didWin ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          {didWin ? (
-            <CheckCircle className="h-8 w-8 text-green-600" />
-          ) : (
-            <XCircle className="h-8 w-8 text-red-600" />
-          )}
-          <div>
-            <h4 className="font-bold">
-              {didWin ? 'You got it!' : 'Not quite!'}
-            </h4>
-            <p className="text-sm">
-              {didWin ? "You're in tune with the community vibe." : 'Better luck tomorrow!'}
-            </p>
+      <motion.div variants={itemVariants} className="w-full max-w-sm">
+        <Card
+          className={`p-4 ${
+            didWin ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            {didWin ? (
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            ) : (
+              <XCircle className="h-8 w-8 text-red-600" />
+            )}
+            <div>
+              <h4 className="font-bold">
+                {didWin ? 'You got it!' : 'Not quite!'}
+              </h4>
+              <p className="text-sm">
+                {didWin ? "You're in tune with the community vibe." : 'Better luck tomorrow!'}
+              </p>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </motion.div>
       
-      <Button size="lg" className="font-headline text-lg mt-4" onClick={() => alert('Farcaster cast sharing not implemented yet.')}>
-        <MessageSquareQuote className="mr-2 h-5 w-5" />
-        Cast Your Vibe
-      </Button>
-    </div>
+      <motion.div variants={itemVariants}>
+        <Button size="lg" className="font-headline text-lg mt-4" onClick={() => alert('Farcaster cast sharing not implemented yet.')}>
+          <MessageSquareQuote className="mr-2 h-5 w-5" />
+          Cast Your Vibe
+        </Button>
+      </motion.div>
+    </motion.div>
   );
 }
-
-
-function TrophyIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-      <svg
-        {...props}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-        <path d="M4 22h16" />
-        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
-        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
-        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-      </svg>
-    )
-  }
