@@ -10,9 +10,10 @@ import { cn } from '@/lib/utils';
 type ResultsProps = {
   selectedEmoji: string | null;
   winningEmoji: string | null;
+  streak: number;
 };
 
-export function Results({ selectedEmoji, winningEmoji }: ResultsProps) {
+export function Results({ selectedEmoji, winningEmoji, streak }: ResultsProps) {
   if (!selectedEmoji || !winningEmoji) {
     return (
         <div className="text-center p-8">
@@ -22,6 +23,12 @@ export function Results({ selectedEmoji, winningEmoji }: ResultsProps) {
   }
 
   const didWin = selectedEmoji === winningEmoji;
+
+  const handleShare = () => {
+    const text = `I just played VibeCheck! My vibe was ${selectedEmoji}, the winning vibe was ${winningEmoji}. My current streak is ${streak} days! 🔥`;
+    const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(window.location.href)}`;
+    window.open(shareUrl, '_blank');
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -107,7 +114,7 @@ export function Results({ selectedEmoji, winningEmoji }: ResultsProps) {
       </motion.div>
       
       <motion.div variants={itemVariants}>
-        <Button size="lg" className="font-headline text-lg mt-4" onClick={() => alert('Farcaster cast sharing not implemented yet.')}>
+        <Button size="lg" className="font-headline text-lg mt-4" onClick={handleShare}>
           <MessageSquareQuote className="mr-2 h-5 w-5" />
           Cast Your Vibe
         </Button>

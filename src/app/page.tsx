@@ -281,7 +281,7 @@ export default function Home() {
               </CardHeader>
               <CardContent className="p-6">
                 {isClient && hasVotedToday ? (
-                  <Results selectedEmoji={selectedEmoji} winningEmoji={winningEmoji} />
+                  <Results selectedEmoji={selectedEmoji} winningEmoji={winningEmoji} streak={userStats.streak} />
                 ) : (
                   <EmojiSelection 
                     onVote={handleVote} 
