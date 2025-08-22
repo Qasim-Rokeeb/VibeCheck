@@ -11,7 +11,7 @@ import { GameStats } from '@/components/vibe-check/GameStats';
 import { Leaderboard } from '@/components/vibe-check/Leaderboard';
 import { dailyEmojis, winningEmoji as mockWinningEmoji } from '@/lib/mock-data';
 import { Flame, Star } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
 
 export default function Home() {
