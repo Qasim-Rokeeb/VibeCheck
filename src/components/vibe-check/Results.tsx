@@ -1,9 +1,11 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle, MessageSquareQuote, Trophy, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 type ResultsProps = {
   selectedEmoji: string | null;
@@ -57,7 +59,10 @@ export function Results({ selectedEmoji, winningEmoji }: ResultsProps) {
       <div className="flex flex-wrap justify-center gap-6 md:gap-10">
         <motion.div variants={itemVariants} className="flex flex-col items-center gap-2">
           <p className="font-semibold text-muted-foreground">Your Vote</p>
-          <div className="text-6xl md:text-7xl p-4 bg-secondary rounded-2xl shadow-inner">
+          <div className={cn(
+              "text-6xl md:text-7xl p-4 rounded-2xl shadow-inner",
+              didWin ? "bg-primary/10 border-2 border-primary" : "bg-secondary"
+            )}>
             {selectedEmoji}
           </div>
         </motion.div>
@@ -80,7 +85,7 @@ export function Results({ selectedEmoji, winningEmoji }: ResultsProps) {
       <motion.div variants={itemVariants} className="w-full max-w-sm">
         <Card
           className={`p-4 ${
-            didWin ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'
+            didWin ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-800'
           }`}
         >
           <div className="flex items-center gap-3">
