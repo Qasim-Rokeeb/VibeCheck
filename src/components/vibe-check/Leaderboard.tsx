@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { leaderboardData } from '@/lib/mock-data';
 import { Trophy } from 'lucide-react';
@@ -17,6 +18,8 @@ const rankTextStyles = {
 };
 
 export function Leaderboard() {
+  const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
+
   return (
     <Card className="shadow-lg">
       <CardHeader>
@@ -24,7 +27,7 @@ export function Leaderboard() {
           <Trophy className="text-primary" />
           VibeBoard
         </CardTitle>
-        <CardDescription>Top players by correct guesses and streaks.</CardDescription>
+        <CardDescription>Top players for {currentMonthName}. Resets monthly.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
