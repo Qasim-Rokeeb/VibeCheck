@@ -1,12 +1,17 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Flame, Star, Zap } from 'lucide-react';
+import { Flame, Star, Snowflake } from 'lucide-react';
 import { Progress } from '../ui/progress';
+import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 type GameStatsProps = {
   stats: {
     xp: number;
     streak: number;
+    lastStreakFreeze: Date | null;
   };
+  isStreakFreezeAvailable: boolean;
 };
 
 // Simple level calculation for demonstration
@@ -28,9 +33,15 @@ const calculateStreak = (streak: number) => {
 };
 
 
-export function GameStats({ stats }: GameStatsProps) {
+export function GameStats({ stats, isStreakFreezeAvailable }: GameStatsProps) {
   const { level, progress, nextLevelXP } = calculateLevel(stats.xp);
   const { milestoneProgress, nextMilestone } = calculateStreak(stats.streak);
+
+  const nextFreezeDate = stats.lastStreakFreeze ? new Date(stats.lastStreakFreeze) : null;
+  if (nextFreezeDate) {
+    nextFreezeDate.setDate(nextFreezeDate.getDate() + 7);
+  }
+
 
   return (
     <Card className="shadow-lg">
@@ -56,6 +67,25 @@ export function GameStats({ stats }: GameStatsProps) {
             </div>
             <Progress value={milestoneProgress} className="[&>div]:bg-orange-500" aria-label={`Streak progress: ${milestoneProgress.toFixed(0)}%`} />
             <p className="text-xs text-muted-foreground text-right">Next bonus at {nextMilestone} days!</p>
+        </div>
+
+        <div className="space-y-2">
+            <div className="flex justify-between items-center text-muted-foreground text-sm">
+                <div className="flex items-center gap-1">
+                    <Snowflake className={cn("h-4 w-4", isStreakFreezeAvailable ? "text-blue-400" : "text-muted-foreground")} />
+                    <span className="font-semibold">Streak Freeze</span>
+                </div>
+                <span className={cn("font-semibold", isStreakFreezeAvailable ? "text-green-500" : "text-muted-foreground")}>
+                    {isStreakFreezeAvailable ? 'Available' : 'Unavailable'}
+                </span>
+            </div>
+            <div className="text-xs text-muted-foreground text-right">
+                {isStreakFreezeAvailable ? (
+                    "Use it before voting to protect your streak!"
+                ) : (
+                    `Next available on ${nextFreezeDate?.toLocaleDateString()}`
+                )}
+            </div>
         </div>
       </CardContent>
     </Card>

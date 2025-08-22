@@ -4,14 +4,19 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ThumbsUp, Plus } from 'lucide-react';
+import { ThumbsUp, Plus, Snowflake } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { moreEmojis } from '@/lib/mock-data';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 
 type EmojiSelectionProps = {
   emojis: string[];
   onVote: (emoji: string) => void;
+  isStreakFreezeAvailable: boolean;
+  useStreakFreeze: boolean;
+  setUseStreakFreeze: (value: boolean) => void;
 };
 
 const emojiDescriptions: { [key: string]: string } = {
@@ -123,7 +128,7 @@ const emojiDescriptions: { [key: string]: string } = {
 };
 
 
-export function EmojiSelection({ emojis, onVote }: EmojiSelectionProps) {
+export function EmojiSelection({ emojis, onVote, isStreakFreezeAvailable, useStreakFreeze, setUseStreakFreeze }: EmojiSelectionProps) {
   const [selected, setSelected] = useState<string | null>(null);
 
   const handleSelect = (emoji: string) => {
@@ -197,6 +202,17 @@ export function EmojiSelection({ emojis, onVote }: EmojiSelectionProps) {
           </PopoverContent>
         </Popover>
       </div>
+
+      {isStreakFreezeAvailable && (
+        <div className="flex items-center space-x-2 bg-secondary p-3 rounded-lg">
+            <Switch id="streak-freeze" checked={useStreakFreeze} onCheckedChange={setUseStreakFreeze} />
+            <Label htmlFor="streak-freeze" className="flex items-center gap-2 text-sm font-medium">
+                <Snowflake className="h-4 w-4 text-blue-400" />
+                Use Streak Freeze? (Protects streak on loss)
+            </Label>
+        </div>
+      )}
+
       <Button
         size="lg"
         onClick={handleSubmit}

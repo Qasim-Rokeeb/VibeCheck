@@ -19,12 +19,19 @@ import { BottomNav } from '@/components/vibe-check/BottomNav';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
-  const [userStats, setUserStats] = useState({ xp: 120, streak: 2 });
+  const [userStats, setUserStats] = useState({
+    xp: 120,
+    streak: 2,
+    lastStreakFreeze: null as Date | null,
+  });
   const [hasVotedToday, setHasVotedToday] = useState(false);
   const [winningEmoji, setWinningEmoji] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [useStreakFreeze, setUseStreakFreeze] = useState(false);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
@@ -36,6 +43,15 @@ export default function Home() {
       setHasVotedToday(true);
       setSelectedEmoji(storedVote);
       setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
+    }
+
+    const storedUserStats = localStorage.getItem('vibeCheckUserStats');
+    if (storedUserStats) {
+      const parsedStats = JSON.parse(storedUserStats);
+      setUserStats({
+        ...parsedStats,
+        lastStreakFreeze: parsedStats.lastStreakFreeze ? new Date(parsedStats.lastStreakFreeze) : null,
+      });
     }
 
     const handleResize = () => {
@@ -50,6 +66,13 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem('vibeCheckUserStats', JSON.stringify(userStats));
+    }
+  }, [userStats, isClient]);
+
+
   const handleVote = (emoji: string) => {
     if (hasVotedToday) return;
 
@@ -62,6 +85,7 @@ export default function Home() {
 
     let xpGained = 0;
     let streakBonus = 0;
+    let toastDescription: React.ReactNode;
 
     if (emoji === mockWinningEmoji) {
       setShowConfetti(true);
@@ -71,39 +95,62 @@ export default function Home() {
       if (userStats.streak >= 3) {
         streakBonus = 5;
       }
-      setUserStats(prev => ({
-        xp: prev.xp + xpGained + streakBonus,
-        streak: prev.streak + 1,
-      }));
+      const newStats = {
+        ...userStats,
+        xp: userStats.xp + xpGained + streakBonus,
+        streak: userStats.streak + 1,
+      };
+      setUserStats(newStats);
+      toastDescription = (
+        <>
+          <span className="font-bold text-green-500">You guessed correctly!</span>
+          <span>
+            + {xpGained} XP <Star className="inline h-4 w-4 text-yellow-400 fill-yellow-400" />
+          </span>
+          {streakBonus > 0 && (
+            <span>
+              + {streakBonus} Bonus XP <Flame className="inline h-4 w-4 text-orange-500 fill-orange-500" />
+            </span>
+          )}
+        </>
+      );
     } else {
-      setUserStats(prev => ({ ...prev, streak: 0 }));
+      if (useStreakFreeze) {
+        const newStats = {
+            ...userStats,
+            lastStreakFreeze: new Date(),
+        };
+        setUserStats(newStats);
+        toastDescription = (
+            <>
+                <span className="font-bold text-blue-500">Streak Frozen!</span>
+                <span>Your streak is safe for today.</span>
+            </>
+        );
+      } else {
+        const newStats = { ...userStats, streak: 0 };
+        setUserStats(newStats);
+        toastDescription = (
+            <>
+                <span className="font-bold text-destructive">Not this time!</span>
+                <span>Your streak has been reset.</span>
+            </>
+        );
+      }
     }
     
     toast({
       title: "Vote Cast!",
-      description: (
-        <div className="flex flex-col">
-          {emoji === mockWinningEmoji ? (
-            <>
-              <span className="font-bold text-green-500">You guessed correctly!</span>
-              <span>
-                + {xpGained} XP <Star className="inline h-4 w-4 text-yellow-400 fill-yellow-400" />
-              </span>
-              {streakBonus > 0 && (
-                <span>
-                  + {streakBonus} Bonus XP <Flame className="inline h-4 w-4 text-orange-500 fill-orange-500" />
-                </span>
-              )}
-            </>
-          ) : (
-            <>
-              <span className="font-bold text-destructive">Not this time!</span>
-              <span>Your streak has been reset.</span>
-            </>
-          )}
-        </div>
-      ),
+      description: <div className="flex flex-col">{toastDescription}</div>,
     });
+    setUseStreakFreeze(false); // Reset for next time
+  };
+
+  const isStreakFreezeAvailable = () => {
+    if (!userStats.lastStreakFreeze) return true;
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return userStats.lastStreakFreeze < sevenDaysAgo;
   };
 
   return (
@@ -131,7 +178,13 @@ export default function Home() {
                 {isClient && hasVotedToday ? (
                   <Results selectedEmoji={selectedEmoji} winningEmoji={winningEmoji} />
                 ) : (
-                  <EmojiSelection onVote={handleVote} emojis={dailyEmojis} />
+                  <EmojiSelection 
+                    onVote={handleVote} 
+                    emojis={dailyEmojis} 
+                    isStreakFreezeAvailable={isStreakFreezeAvailable()}
+                    useStreakFreeze={useStreakFreeze}
+                    setUseStreakFreeze={setUseStreakFreeze}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -141,7 +194,7 @@ export default function Home() {
           </div>
           <div className="space-y-8">
             <div id="stats">
-              <GameStats stats={userStats} />
+              <GameStats stats={userStats} isStreakFreezeAvailable={isStreakFreezeAvailable()} />
             </div>
             <div id="leaderboard">
               <Leaderboard />
