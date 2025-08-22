@@ -1,6 +1,11 @@
+import { ModeToggle } from "./mode-toggle";
+
 export function Header() {
   return (
-    <header className="text-center py-4">
+    <header className="text-center py-4 relative">
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
+      </div>
       <h1 className="text-5xl md:text-6xl font-bold font-headline text-primary tracking-tighter">
         VibeCheck
       </h1>
