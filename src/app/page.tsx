@@ -11,7 +11,7 @@ import { AiVibeTool } from '@/components/vibe-check/AiVibeTool';
 import { GameStats } from '@/components/vibe-check/GameStats';
 import { Leaderboard } from '@/components/vibe-check/Leaderboard';
 import { dailyEmojis, winningEmoji as mockWinningEmoji } from '@/lib/mock-data';
-import { Flame, Star, Vote } from 'lucide-react';
+import { Award, Flame, Star, Vote } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
 import Confetti from 'react-confetti';
@@ -89,6 +89,7 @@ export default function Home() {
     let isWeekendBonus = false;
     let toastDescription: React.ReactNode;
     let newStats = { ...userStats };
+    const currentStreak = userStats.streak;
 
     if (emoji === mockWinningEmoji) {
       setShowConfetti(true);
@@ -101,34 +102,59 @@ export default function Home() {
         isWeekendBonus = true;
       }
       
-      if (userStats.streak >= 3) {
+      if (currentStreak >= 3) {
         streakBonus = 5;
       }
-      newStats = {
-        ...userStats,
-        xp: userStats.xp + xpGained + streakBonus + firstVoteBonus,
-        streak: userStats.streak + 1,
-      };
-      
-      toastDescription = (
-        <>
-          <span className="font-bold text-green-500">You guessed correctly!</span>
-          <span>
-            + {firstVoteBonus} XP <Vote className="inline h-4 w-4 text-primary" /> (Vote Bonus)
-          </span>
-          {isWeekendBonus && (
-            <span className="font-bold text-primary">Weekend Bonus: 2x XP!</span>
-          )}
-          <span>
-            + {xpGained} XP <Star className="inline h-4 w-4 text-yellow-400 fill-yellow-400" />
-          </span>
-          {streakBonus > 0 && (
+
+      const newStreak = currentStreak + 1;
+
+      if (newStreak === 100) {
+        // Prestige reset!
+        const prestigeBonus = 1000;
+        newStats = {
+          ...userStats,
+          xp: userStats.xp + xpGained + streakBonus + firstVoteBonus + prestigeBonus,
+          streak: 0, // Reset streak
+        };
+        toastDescription = (
+            <>
+                <span className="font-bold text-primary text-lg flex items-center gap-2">
+                    <Award className="h-6 w-6" />
+                    PRESTIGE!
+                </span>
+                <span>You reached a 100-day streak! It resets now, but you've earned a huge bonus.</span>
+                <span>
+                    + {prestigeBonus} XP <Star className="inline h-4 w-4 text-yellow-400 fill-yellow-400" /> (Prestige Bonus)
+                </span>
+            </>
+        );
+      } else {
+        newStats = {
+          ...userStats,
+          xp: userStats.xp + xpGained + streakBonus + firstVoteBonus,
+          streak: newStreak,
+        };
+        
+        toastDescription = (
+          <>
+            <span className="font-bold text-green-500">You guessed correctly!</span>
             <span>
-              + {streakBonus} Bonus XP <Flame className="inline h-4 w-4 text-orange-500 fill-orange-500" />
+              + {firstVoteBonus} XP <Vote className="inline h-4 w-4 text-primary" /> (Vote Bonus)
             </span>
-          )}
-        </>
-      );
+            {isWeekendBonus && (
+              <span className="font-bold text-primary">Weekend Bonus: 2x XP!</span>
+            )}
+            <span>
+              + {xpGained} XP <Star className="inline h-4 w-4 text-yellow-400 fill-yellow-400" />
+            </span>
+            {streakBonus > 0 && (
+              <span>
+                + {streakBonus} Bonus XP <Flame className="inline h-4 w-4 text-orange-500 fill-orange-500" />
+              </span>
+            )}
+          </>
+        );
+      }
     } else {
         if (useStreakFreeze) {
             newStats = {

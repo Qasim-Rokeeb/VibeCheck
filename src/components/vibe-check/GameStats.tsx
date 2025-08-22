@@ -23,13 +23,22 @@ const calculateLevel = (xp: number) => {
   return { level, progress, nextLevelXP };
 };
 
-const streakMilestones = [3, 7, 14, 30];
+const streakMilestones = [3, 7, 14, 30, 50, 75, 100];
 
 const calculateStreak = (streak: number) => {
-  const currentMilestone = streakMilestones.find(m => streak < m) || streakMilestones[streakMilestones.length -1];
+  // If streak is 100 or more, the next milestone is prestige
+  if (streak >= 100) {
+    return { milestoneProgress: 100, nextMilestone: "Prestige!" };
+  }
+  const nextMilestone = streakMilestones.find(m => streak < m) || streakMilestones[streakMilestones.length -1];
   const previousMilestone = streakMilestones.slice().reverse().find(m => m <= streak) || 0;
-  const milestoneProgress = ((streak - previousMilestone) / (currentMilestone - previousMilestone)) * 100;
-  return { milestoneProgress, nextMilestone: currentMilestone };
+
+  // Avoid division by zero if current streak is a milestone
+  const totalSteps = nextMilestone - previousMilestone;
+  const currentSteps = streak - previousMilestone;
+  const milestoneProgress = totalSteps > 0 ? (currentSteps / totalSteps) * 100 : 100;
+
+  return { milestoneProgress, nextMilestone };
 };
 
 
@@ -66,7 +75,9 @@ export function GameStats({ stats, isStreakFreezeAvailable }: GameStatsProps) {
                 <span className="font-semibold text-foreground">{stats.streak} Days</span>
             </div>
             <Progress value={milestoneProgress} className="[&>div]:bg-orange-500" aria-label={`Streak progress: ${milestoneProgress.toFixed(0)}%`} />
-            <p className="text-xs text-muted-foreground text-right">Next bonus at {nextMilestone} days!</p>
+            <p className="text-xs text-muted-foreground text-right">
+              {typeof nextMilestone === 'number' ? `Next bonus at ${nextMilestone} days!` : nextMilestone}
+            </p>
         </div>
 
         <div className="space-y-2">
