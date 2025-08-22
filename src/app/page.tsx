@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
 import Confetti from 'react-confetti';
 import { BottomNav } from '@/components/vibe-check/BottomNav';
+import { seededShuffle } from '@/lib/utils';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -30,6 +31,7 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [useStreakFreeze, setUseStreakFreeze] = useState(false);
+  const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
 
   const { toast } = useToast();
 
@@ -39,6 +41,9 @@ export default function Home() {
     const lastVoteDate = localStorage.getItem('vibeCheckVoteDate');
     const storedVote = localStorage.getItem('vibeCheckVoteEmoji');
     
+    // Shuffle emojis daily for all users consistently
+    setShuffledEmojis(seededShuffle(dailyEmojis, today));
+
     if (lastVoteDate === today && storedVote) {
       setHasVotedToday(true);
       setSelectedEmoji(storedVote);
@@ -232,7 +237,7 @@ export default function Home() {
                 ) : (
                   <EmojiSelection 
                     onVote={handleVote} 
-                    emojis={dailyEmojis} 
+                    emojis={shuffledEmojis} 
                     isStreakFreezeAvailable={isStreakFreezeAvailable()}
                     useStreakFreeze={useStreakFreeze}
                     setUseStreakFreeze={setUseStreakFreeze}
