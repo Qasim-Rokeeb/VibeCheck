@@ -1,3 +1,6 @@
+
+export type RankTitle = 'Vibe Oracle' | 'Streak Lord' | 'Vibe Sniper' | 'Newbie';
+
 export type Player = {
   id: number;
   name: string;
@@ -5,5 +8,5 @@ export type Player = {
   xp: number;
   streak: number;
   rank: number;
-  title: string;
+  title: RankTitle;
 };

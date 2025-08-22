@@ -4,6 +4,8 @@ import { leaderboardData } from '@/lib/mock-data';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { RankBadge } from './RankBadge';
+import type { Player } from '@/lib/types';
 
 const rankStyles = {
   1: 'bg-yellow-400/20 border-yellow-500/50',
@@ -16,6 +18,15 @@ const rankTextStyles = {
   2: 'text-gray-400',
   3: 'text-amber-700',
 };
+
+// Helper to determine rank from XP
+const getRankTitle = (xp: number): Player['title'] => {
+    if (xp >= 900) return 'Vibe Oracle';
+    if (xp >= 800) return 'Streak Lord';
+    if (xp >= 700) return 'Vibe Sniper';
+    return 'Newbie';
+}
+
 
 export function Leaderboard() {
   const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
@@ -51,7 +62,7 @@ export function Leaderboard() {
               </Avatar>
               <div className="flex-grow">
                 <p className="font-semibold text-card-foreground">{player.name}</p>
-                <p className="text-sm text-muted-foreground">{player.title}</p>
+                <RankBadge title={getRankTitle(player.xp)} />
               </div>
               <div className="text-right">
                 <p className="font-bold text-lg text-primary">{player.xp}</p>
