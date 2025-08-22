@@ -41,7 +41,6 @@ export default function Home() {
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [useStreakFreeze, setUseStreakFreeze] = useState(false);
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
-  const [showStreakLossModal, setShowStreakLossModal] = useState(false);
 
   const { toast } = useToast();
 
@@ -64,26 +63,6 @@ export default function Home() {
         lastStreakFreeze: parsedStats.lastStreakFreeze ? new Date(parsedStats.lastStreakFreeze) : null,
       };
 
-      if (lastVoteDateStr) {
-        const lastVoteDate = new Date(lastVoteDateStr);
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-
-        if (lastVoteDate.toDateString() !== todayString && lastVoteDate.toDateString() !== yesterday.toDateString()) {
-           if (currentStats.streak > 0) {
-              setShowStreakLossModal(true);
-              const newStats = { ...currentStats, streak: 0 };
-              setUserStats(newStats);
-              localStorage.setItem('vibeCheckUserStats', JSON.stringify(newStats));
-            }
-        }
-      } else if (currentStats.streak > 0) {
-        // If there are stats but no vote date, it implies a missed day from a previous session.
-        setShowStreakLossModal(true);
-        const newStats = { ...currentStats, streak: 0 };
-        setUserStats(newStats);
-        localStorage.setItem('vibeCheckUserStats', JSON.stringify(newStats));
-      }
        if (lastVoteDateStr === todayString && storedVote) {
         setHasVotedToday(true);
         setSelectedEmoji(storedVote);
@@ -254,19 +233,6 @@ export default function Home() {
           numberOfPieces={400}
         />
       )}
-      <AlertDialog open={showStreakLossModal} onOpenChange={setShowStreakLossModal}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2"><Flame className="h-6 w-6 text-destructive" />Streak Lost!</AlertDialogTitle>
-            <AlertDialogDescription>
-              Oh no! You missed a day and your streak has been reset to zero. Don't worry, you can start a new one today!
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowStreakLossModal(false)}>Got it</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <Header />
