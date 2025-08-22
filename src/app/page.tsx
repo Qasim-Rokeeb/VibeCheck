@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -14,6 +15,7 @@ import { Flame, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
 import Confetti from 'react-confetti';
+import { BottomNav } from '@/components/vibe-check/BottomNav';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -105,7 +107,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-background text-foreground p-4 sm:p-6 md:p-8">
+    <div className="flex flex-col items-center min-h-screen bg-background text-foreground p-4 sm:p-6 md:p-8 pb-20">
        {isClient && showConfetti && (
         <Confetti
           width={windowSize.width}
@@ -117,7 +119,7 @@ export default function Home() {
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <Header />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8" id="home">
             <Card className="overflow-hidden shadow-lg">
               <CardHeader className="bg-card-foreground/5">
                 <CardTitle className="font-headline text-2xl">
@@ -133,15 +135,22 @@ export default function Home() {
                 )}
               </CardContent>
             </Card>
-            <AiVibeTool />
+            <div id="ai-tool">
+              <AiVibeTool />
+            </div>
           </div>
           <div className="space-y-8">
-            <GameStats stats={userStats} />
-            <Leaderboard />
+            <div id="stats">
+              <GameStats stats={userStats} />
+            </div>
+            <div id="leaderboard">
+              <Leaderboard />
+            </div>
           </div>
         </div>
         <Footer />
       </div>
+      <BottomNav />
     </div>
   );
 }
