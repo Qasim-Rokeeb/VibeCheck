@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { leaderboardData } from '@/lib/mock-data';
 import { Trophy } from 'lucide-react';
@@ -10,8 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { RankBadge } from './RankBadge';
 import type { Player } from '@/lib/types';
 import { motion } from 'framer-motion';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 
 const rankStyles = {
   1: 'bg-yellow-400/20 border-yellow-500/50',
@@ -35,35 +32,20 @@ const getRankTitle = (xp: number): Player['title'] => {
 
 
 export function Leaderboard() {
-  const [isCompact, setIsCompact] = useState(true);
   const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
-
-  const playersToShow = isCompact ? leaderboardData.slice(0, 3) : leaderboardData;
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="flex-row items-center justify-between">
-        <div>
-          <CardTitle className="font-headline text-2xl flex items-center gap-2">
-            <Trophy className="text-primary" />
-            VibeBoard
-          </CardTitle>
-          <CardDescription>Top players for {currentMonthName}.</CardDescription>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Label htmlFor="compact-leaderboard" className="text-sm font-medium text-muted-foreground">
-            Compact
-          </Label>
-          <Switch
-            id="compact-leaderboard"
-            checked={isCompact}
-            onCheckedChange={setIsCompact}
-          />
-        </div>
+      <CardHeader>
+        <CardTitle className="font-headline text-2xl flex items-center gap-2">
+          <Trophy className="text-primary" />
+          VibeBoard
+        </CardTitle>
+        <CardDescription>Top players for {currentMonthName}.</CardDescription>
       </CardHeader>
       <CardContent>
-        <motion.div layout className="space-y-4">
-          {playersToShow.map((player, index) => (
+        <div className="space-y-4">
+          {leaderboardData.map((player, index) => (
             <motion.div
               key={player.id}
               layout
@@ -96,7 +78,7 @@ export function Leaderboard() {
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </CardContent>
     </Card>
   );
