@@ -45,7 +45,7 @@ export default function Home() {
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
   const [showStreakLossModal, setShowStreakLossModal] = useState(false);
   const [showRevealModal, setShowRevealModal] = useState(false);
-
+  const [xpGainedToday, setXpGainedToday] = useState(0);
 
   const { toast } = useToast();
 
@@ -57,6 +57,8 @@ export default function Home() {
     const lastVoteDateStr = localStorage.getItem('vibeCheckVoteDate');
     const storedVote = localStorage.getItem('vibeCheckVoteEmoji');
     const storedUserStatsStr = localStorage.getItem('vibeCheckUserStats');
+    const storedXpGainedStr = localStorage.getItem('vibeCheckXpGained');
+
 
     // Shuffle emojis daily for all users consistently
     setShuffledEmojis(seededShuffle(dailyEmojis, todayString));
@@ -83,6 +85,9 @@ export default function Home() {
         setHasVotedToday(true);
         setSelectedEmoji(storedVote);
         setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
+        setXpGainedToday(storedXpGainedStr ? parseInt(storedXpGainedStr, 10) : 0);
+      } else {
+        localStorage.removeItem('vibeCheckXpGained');
       }
       setUserStats(currentStats);
     }
@@ -110,8 +115,11 @@ export default function Home() {
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('vibeCheckUserStats', JSON.stringify(userStats));
+      if (hasVotedToday) {
+        localStorage.setItem('vibeCheckXpGained', xpGainedToday.toString());
+      }
     }
-  }, [userStats, isClient]);
+  }, [userStats, isClient, hasVotedToday, xpGainedToday]);
 
   const handleShare = () => {
     const text = `I just played VibeCheck! My vibe was ${selectedEmoji}, the winning vibe was ${winningEmoji}. My current streak is ${userStats.streak} days! 🔥`;
@@ -236,6 +244,8 @@ export default function Home() {
         }
     }
     
+    const totalXpGained = newStats.xp - userStats.xp;
+    setXpGainedToday(totalXpGained);
     setUserStats(newStats);
 
     toast({
@@ -334,7 +344,7 @@ export default function Home() {
           </div>
           <div className="space-y-8">
             <div id="stats">
-              <GameStats stats={userStats} isStreakFreezeAvailable={isStreakFreezeAvailable()} />
+              <GameStats stats={userStats} isStreakFreezeAvailable={isStreakFreezeAvailable()} xpGainedToday={xpGainedToday} />
             </div>
             <div id="leaderboard">
               <Leaderboard />

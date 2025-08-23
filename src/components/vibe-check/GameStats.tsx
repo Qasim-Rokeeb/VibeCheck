@@ -4,6 +4,8 @@ import { Flame, Star, Snowflake } from 'lucide-react';
 import { Progress } from '../ui/progress';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { Badge } from '../ui/badge';
+import { motion } from 'framer-motion';
 
 type GameStatsProps = {
   stats: {
@@ -12,6 +14,7 @@ type GameStatsProps = {
     lastStreakFreeze: Date | null;
   };
   isStreakFreezeAvailable: boolean;
+  xpGainedToday: number;
 };
 
 // Simple level calculation for demonstration
@@ -42,7 +45,7 @@ const calculateStreak = (streak: number) => {
 };
 
 
-export function GameStats({ stats, isStreakFreezeAvailable }: GameStatsProps) {
+export function GameStats({ stats, isStreakFreezeAvailable, xpGainedToday }: GameStatsProps) {
   const { level, progress, nextLevelXP } = calculateLevel(stats.xp);
   const { milestoneProgress, nextMilestone } = calculateStreak(stats.streak);
 
@@ -61,7 +64,16 @@ export function GameStats({ stats, isStreakFreezeAvailable }: GameStatsProps) {
         <div className="space-y-2">
           <div className="flex justify-between items-center text-muted-foreground text-sm">
             <span className="font-semibold">Level {level}</span>
-            <span className="font-semibold text-foreground">{stats.xp} / {nextLevelXP} XP</span>
+            <div className='flex items-center gap-2'>
+              {xpGainedToday > 0 && (
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                  <Badge variant="secondary" className='text-green-600'>
+                    +{xpGainedToday} XP Today
+                  </Badge>
+                </motion.div>
+              )}
+              <span className="font-semibold text-foreground">{stats.xp} / {nextLevelXP} XP</span>
+            </div>
           </div>
           <Progress value={progress} aria-label={`${progress.toFixed(0)}% to next level`} />
         </div>
