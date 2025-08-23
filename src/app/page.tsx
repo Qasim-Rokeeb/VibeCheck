@@ -11,7 +11,7 @@ import { AiVibeTool } from '@/components/vibe-check/AiVibeTool';
 import { GameStats } from '@/components/vibe-check/GameStats';
 import { Leaderboard } from '@/components/vibe-check/Leaderboard';
 import { dailyEmojis, winningEmoji as mockWinningEmoji } from '@/lib/mock-data';
-import { Award, Flame, Star, Vote } from 'lucide-react';
+import { Award, Flame, MessageSquareQuote, Star, ThumbsUp, Vote } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/vibe-check/Footer';
 import Confetti from 'react-confetti';
@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -42,6 +43,8 @@ export default function Home() {
   const [useStreakFreeze, setUseStreakFreeze] = useState(false);
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
   const [showStreakLossModal, setShowStreakLossModal] = useState(false);
+  const [showRevealModal, setShowRevealModal] = useState(false);
+
 
   const { toast } = useToast();
 
@@ -109,6 +112,11 @@ export default function Home() {
     }
   }, [userStats, isClient]);
 
+  const handleShare = () => {
+    const text = `I just played VibeCheck! My vibe was ${selectedEmoji}, the winning vibe was ${winningEmoji}. My current streak is ${userStats.streak} days! 🔥`;
+    const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(window.location.href)}`;
+    window.open(shareUrl, '_blank');
+  };
 
   const handleVote = (emoji: string) => {
     if (hasVotedToday) return;
@@ -119,6 +127,7 @@ export default function Home() {
     setSelectedEmoji(emoji);
     setHasVotedToday(true);
     setWinningEmoji(mockWinningEmoji);
+    setShowRevealModal(true);
 
     let xpGained = 0;
     let streakBonus = 0;
@@ -266,6 +275,25 @@ export default function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={showRevealModal} onOpenChange={setShowRevealModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center font-headline text-2xl">Today's Vibe Is...</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">The results are in! Here's how you did.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <Results selectedEmoji={selectedEmoji} winningEmoji={winningEmoji} streak={userStats.streak} />
+          <AlertDialogFooter className="sm:justify-center gap-2 sm:gap-4">
+             <Button variant="outline" onClick={() => setShowRevealModal(false)}>
+                Close
+              </Button>
+              <Button onClick={handleShare}>
+                  <MessageSquareQuote className="mr-2 h-5 w-5" />
+                  Share on Warpcast
+              </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <Header />
@@ -280,7 +308,13 @@ export default function Home() {
               </CardHeader>
               <CardContent className="p-6">
                 {isClient && hasVotedToday ? (
-                  <Results selectedEmoji={selectedEmoji} winningEmoji={winningEmoji} streak={userStats.streak} />
+                  <div className="text-center py-8">
+                    <p className="text-2xl font-bold font-headline mb-2">You've already voted today!</p>
+                    <p className="text-muted-foreground">Come back tomorrow for the next VibeCheck.</p>
+                    <Button variant="secondary" className="mt-4" onClick={() => setShowRevealModal(true)}>
+                      Show My Results
+                    </Button>
+                  </div>
                 ) : (
                   <EmojiSelection 
                     onVote={handleVote} 
