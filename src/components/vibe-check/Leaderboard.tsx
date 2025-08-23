@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { RankBadge } from './RankBadge';
 import type { Player } from '@/lib/types';
+import { motion } from 'framer-motion';
 
 const rankStyles = {
   1: 'bg-yellow-400/20 border-yellow-500/50',
@@ -41,10 +42,14 @@ export function Leaderboard() {
         <CardDescription>Top players for {currentMonthName}. Resets monthly.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <motion.div layout className="space-y-4">
           {leaderboardData.map((player, index) => (
-            <div
+            <motion.div
               key={player.id}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
               className={cn(
                 'flex items-center gap-4 p-3 rounded-lg transition-colors bg-card hover:bg-secondary/50 border',
                 rankStyles[player.rank as keyof typeof rankStyles] || 'border-transparent'
@@ -68,9 +73,9 @@ export function Leaderboard() {
                 <p className="font-bold text-lg text-primary">{player.xp}</p>
                 <p className="text-xs text-muted-foreground">XP</p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </CardContent>
     </Card>
   );
