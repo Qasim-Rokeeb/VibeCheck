@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { EmojiHistoryChart } from '@/components/vibe-check/EmojiHistoryChart';
+import type { VoteHistory } from '@/lib/types';
+
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -54,11 +56,24 @@ export default function Home() {
     const today = new Date();
     const todayString = today.toDateString();
     
-    const lastVoteDateStr = localStorage.getItem('vibeCheckVoteDate');
-    const storedVote = localStorage.getItem('vibeCheckVoteEmoji');
+    // Check for last vote to determine if voted today
+    const lastVoteDateStr = localStorage.getItem('vibeCheckLastVoteDate');
+    if (lastVoteDateStr === todayString) {
+      setHasVotedToday(true);
+      const voteHistoryStr = localStorage.getItem('vibeCheckVoteHistory');
+      if (voteHistoryStr) {
+        const voteHistory: VoteHistory[] = JSON.parse(voteHistoryStr);
+        const todayVote = voteHistory.find(v => v.date === todayString);
+        if (todayVote) {
+          setSelectedEmoji(todayVote.guess);
+        }
+      }
+      setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
+    }
+
+
     const storedUserStatsStr = localStorage.getItem('vibeCheckUserStats');
     const storedXpGainedStr = localStorage.getItem('vibeCheckXpGained');
-
 
     // Shuffle emojis daily for all users consistently
     setShuffledEmojis(seededShuffle(dailyEmojis, todayString));
@@ -80,15 +95,12 @@ export default function Home() {
         }
       }
 
-
-       if (lastVoteDateStr === todayString && storedVote) {
-        setHasVotedToday(true);
-        setSelectedEmoji(storedVote);
-        setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
+      if (lastVoteDateStr === todayString) {
         setXpGainedToday(storedXpGainedStr ? parseInt(storedXpGainedStr, 10) : 0);
       } else {
-        localStorage.removeItem('vibeCheckXpGained');
+         localStorage.removeItem('vibeCheckXpGained');
       }
+
       setUserStats(currentStats);
     }
 
@@ -131,8 +143,24 @@ export default function Home() {
     if (hasVotedToday) return;
 
     const voteDate = new Date();
-    localStorage.setItem('vibeCheckVoteDate', voteDate.toDateString());
-    localStorage.setItem('vibeCheckVoteEmoji', emoji);
+    const todayString = voteDate.toDateString();
+
+    // Store vote history
+    const voteHistoryStr = localStorage.getItem('vibeCheckVoteHistory');
+    let voteHistory: VoteHistory[] = voteHistoryStr ? JSON.parse(voteHistoryStr) : [];
+    
+    const newVote: VoteHistory = {
+      date: todayString,
+      guess: emoji,
+      winner: mockWinningEmoji,
+    };
+    
+    // Add new vote and keep only the last 7 days
+    voteHistory.unshift(newVote);
+    voteHistory = voteHistory.slice(0, 7);
+    localStorage.setItem('vibeCheckVoteHistory', JSON.stringify(voteHistory));
+
+    localStorage.setItem('vibeCheckLastVoteDate', todayString);
     setSelectedEmoji(emoji);
     setHasVotedToday(true);
     setWinningEmoji(mockWinningEmoji);
@@ -357,3 +385,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

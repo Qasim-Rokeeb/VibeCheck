@@ -10,3 +10,11 @@ export type Player = {
   rank: number;
   title: RankTitle;
 };
+
+export type VoteHistory = {
+    date: string;
+    guess: string;
+    winner: string;
+};
+
+    

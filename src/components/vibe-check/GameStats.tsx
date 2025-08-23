@@ -1,11 +1,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Flame, Star, Snowflake } from 'lucide-react';
+import { Flame, Star, Snowflake, CalendarClock } from 'lucide-react';
 import { Progress } from '../ui/progress';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { Badge } from '../ui/badge';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 type GameStatsProps = {
   stats: {
@@ -110,7 +111,16 @@ export function GameStats({ stats, isStreakFreezeAvailable, xpGainedToday }: Gam
                 )}
             </div>
         </div>
+
+        <Link href="/recap" legacyBehavior>
+          <Button variant="outline" className="w-full">
+            <CalendarClock className="mr-2 h-4 w-4" />
+            View Weekly Recap
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   );
 }
+
+    
