@@ -41,6 +41,7 @@ export default function Home() {
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [useStreakFreeze, setUseStreakFreeze] = useState(false);
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
+  const [showStreakLossModal, setShowStreakLossModal] = useState(false);
 
   const { toast } = useToast();
 
@@ -63,12 +64,30 @@ export default function Home() {
         lastStreakFreeze: parsedStats.lastStreakFreeze ? new Date(parsedStats.lastStreakFreeze) : null,
       };
 
+      if (lastVoteDateStr) {
+        const lastVoteDate = new Date(lastVoteDateStr);
+        const diffDays = Math.floor((today.getTime() - lastVoteDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 1 && currentStats.streak > 0) {
+          setShowStreakLossModal(true);
+          setUserStats(prev => ({...prev, streak: 0}));
+        }
+      }
+
+
        if (lastVoteDateStr === todayString && storedVote) {
         setHasVotedToday(true);
         setSelectedEmoji(storedVote);
         setWinningEmoji(mockWinningEmoji); // Reveal winner if already voted
       }
       setUserStats(currentStats);
+    }
+
+    if (window.location.hash) {
+      const element = document.querySelector(window.location.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
 
 
@@ -233,6 +252,20 @@ export default function Home() {
           numberOfPieces={400}
         />
       )}
+      <AlertDialog open={showStreakLossModal} onOpenChange={setShowStreakLossModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Streak Lost!</AlertDialogTitle>
+            <AlertDialogDescription>
+              You missed a day of voting, so your streak has been reset. Don't worry, you can start a new one today!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowStreakLossModal(false)}>Got it</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <Header />

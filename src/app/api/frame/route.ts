@@ -11,7 +11,7 @@ const frameHandler = frames(async (ctx) => {
     <Button
       key={emoji}
       action="post"
-      target={{ pathname: '/vote', query: { emoji } }}
+      target={{ pathname: '/api/frame/vote', query: { emoji } }}
     >
       {emoji}
     </Button>
