@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
+import { EmojiHistoryChart } from '@/components/vibe-check/EmojiHistoryChart';
 
 export default function Home() {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
@@ -326,6 +327,7 @@ export default function Home() {
                 )}
               </CardContent>
             </Card>
+            <EmojiHistoryChart />
             <div id="ai-tool">
               <AiVibeTool />
             </div>
