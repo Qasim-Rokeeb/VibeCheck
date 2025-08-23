@@ -4,8 +4,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { dailyEmojis, emojiHistoryData } from '@/lib/mock-data';
-import { BarChart, TrendingUp } from 'lucide-react';
-import { Bar, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { TrendingUp } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const chartConfig = {
   '💀': { label: '💀', color: 'hsl(var(--chart-1))' },
@@ -27,26 +27,26 @@ export function EmojiHistoryChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={emojiHistoryData} margin={{ top: 20, right: 20, bottom: 5, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
-                    <YAxis tickLine={false} axisLine={false} tickMargin={8} />
-                    <Tooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
-                    />
-                    {dailyEmojis.map((emoji) => (
-                        <Bar
-                            key={emoji}
-                            dataKey={emoji}
-                            stackId="a"
-                            fill={chartConfig[emoji as keyof typeof chartConfig].color}
-                            radius={[4, 4, 0, 0]}
-                        />
-                    ))}
-                </BarChart>
-            </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={emojiHistoryData} margin={{ top: 20, right: 20, bottom: 5, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
+              <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+              <Tooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dot" />}
+              />
+              {dailyEmojis.map((emoji) => (
+                <Bar
+                  key={emoji}
+                  dataKey={emoji}
+                  stackId="a"
+                  fill={`var(--color-${emoji})`}
+                  radius={[4, 4, 0, 0]}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
     </Card>
